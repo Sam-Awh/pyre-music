@@ -4,7 +4,7 @@
   "main": "main.js",
   "author": "bigblackfootman",
   "version": "0.0.1",
-  "repository": "https://github.com/ZerioDev/Music-bot.git",
+  "repository": "https://github.com/bigblackfootman/frop.git",
   "description": "Music functionality for P&P's Bot cluster.",
   "scripts": {
     "start": "node main.js"
