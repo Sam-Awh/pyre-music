@@ -1,10 +1,12 @@
-
 {
   "name": "pnp-music",
   "main": "main.js",
   "author": "bigblackfootman",
   "version": "0.0.1",
-  "repository": "https://github.com/bigblackfootman/frop.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bigblackfootman/frop.git"
+  },
   "description": "Music functionality for P&P's Bot cluster.",
   "scripts": {
     "start": "node main.js"
@@ -15,5 +17,14 @@
     "ffmpeg-static": "^4.4.0",
     "ms": "^3.0.0-canary.1",
     "opusscript": "^0.0.8"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/bigblackfootman/frop/issues"
+  },
+  "homepage": "https://github.com/bigblackfootman/frop#readme",
+  "keywords": [
+    "discord",
+    "bot"
+  ],
+  "license": "ISC"
 }
