@@ -3,69 +3,63 @@ const { QueryType } = require('discord-player');
 
 module.exports = {
     name: 'search',
-    aliases: ['sh'],
+    aliases: [],
+    category: 'Music',
     utilisation: '{prefix}search [song name]',
     voiceChannel: true,
 
     async execute(client, message, args) {
-        if (!args[0]) return message.channel.send(`Please enter a valid search ${message.author}... try again ? ❌`);
 
+        if (!args[0]) return message.channel.send(`Specify song title to seach ${message.author}... try again ? ❌`);
+
+        message.channel.send(`:mag:Searching for **${args.join(' ')}**...`)
         const res = await player.search(args.join(' '), {
             requestedBy: message.member,
             searchEngine: QueryType.AUTO
         });
-
         if (!res || !res.tracks.length) return message.channel.send(`No results found ${message.author}... try again ? ❌`);
 
         const queue = await player.createQueue(message.guild, {
             metadata: message.channel
         });
 
-        const embed = new MessageEmbed();
+        const searchResult =new MessageEmbed()
+        .setColor("RANDOM")
+        .setTitle(`Search Results for : ${args.join(' ')}`)
+        .setDescription(`\n\n${res.tracks.map((t, i) => `**${i + 1}**) [${t.title}](${t.url})`).slice(0,10).join('\n\n')}\n\nSelect choice [1-10] or *cancel*`)
 
-        embed.setColor('PURPLE');
-        embed.setAuthor(`Results for ${args.join(' ')}`, client.user.displayAvatarURL({ size: 1024, dynamic: true }));
+        message.channel.sendTyping()
+        await message.channel.send({embeds:[searchResult]})
 
-        const maxTracks = res.tracks.slice(0, 10);
+        const filter1 = m => m.author.id === message.author.id
 
-        embed.setDescription(`${maxTracks.map((track, i) => `**${i + 1}**. ${track.title} | ${track.author}`).join('\n')}\n\nSelect choice between **1** and **${maxTracks.length}** or **cancel** ⬇️`);
+        const collector = message.channel.createMessageCollector({filter:filter1,time: 15000 ,errors: ['time'] });//can change the timeout to your choice.15000 being 15 seconds
 
-        embed.setTimestamp();
-        embed.setFooter('© FROP', message.author.avatarURL({ dynamic: true }));
-
-        message.channel.send({ embeds: [embed] });
-
-        const collector = message.channel.createMessageCollector({
-            time: 15000,
-            errors: ['time'],
-            filter: m => m.author.id === message.author.id
-        });
-
-        collector.on('collect', async (query) => {
-            if (query.content.toLowerCase() === 'cancel') return message.channel.send(`Search cancelled ✅`) && collector.stop();
-
-            const value = parseInt(query.content);
-
-            if (!value || value <= 0 || value > maxTracks.length) return message.channel.send(`Invalid response, try a value between **1** and **${maxTracks.length}** or **cancel**... try again ? ❌`);
-
-            collector.stop();
-
-            try {
-                if (!queue.connection) await queue.connect(message.member.voice.channel);
-            } catch {
-                await player.deleteQueue(message.guild.id);
-                return message.channel.send(`I can't join the voice channel ${message.author}... try again ? ❌`);
+         collector.on('collect',async (m) => {
+            if (m.content==='cancel'||m.content==='CANCEL') {
+                message.channel.send("Search cancelled...:white_check_mark:")
+                 collector.stop()
             }
 
-            await message.channel.send(`Loading your search... 🎧`);
-
-            queue.addTrack(res.tracks[query.content - 1]);
-
-            if (!queue.playing) await queue.play();
-        });
-
-        collector.on('end', (msg, reason) => {
-            if (reason === 'time') return message.channel.send(`Search timed out ${message.author}... try again ? ❌`);
-        });
-    },
-};
+            else if(isNaN(m.content)|| (Number(m.content) < 0) || (Number(m.content) > 10)){
+                await message.channel.send(`Invalid response ${message.author}...Try a value from 1 to 10...:x:`);
+            } else {
+                collector.stop()
+                try {
+                    if (!queue.connection) await queue.connect(message.member.voice.channel);
+                } catch {
+                    await player.deleteQueue(message.guild.id);
+                    return message.channel.send(`I can't join the voice channel ${message.author}... try again ? ❌`);
+                }
+                await message.channel.send(`Loading your track... 🎧`);
+                queue.addTrack(res.tracks[m.content-1])
+                if (!queue.playing) await queue.play()
+            }
+        })
+        collector.on('end', async (msg, reason) => {
+            if (reason === 'time') {
+           message.channel.send(`Search timed out.. ${message.author}...try again :x:`);
+           }
+           });
+    }
+}
