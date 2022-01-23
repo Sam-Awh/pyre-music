@@ -1,4 +1,4 @@
-# P&P | MUSIC
-Music functionality for P&P's bot cluster.
+# Pyre | MUSIC
+Music functionality for Pyreworks' bot cluster.
 
-~ FROP
+~ Pyreworks
