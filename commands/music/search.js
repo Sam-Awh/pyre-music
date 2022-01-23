@@ -24,7 +24,7 @@ module.exports = {
         });
 
         const searchResult =new MessageEmbed()
-        .setColor("RANDOM")
+        .setColor("ORANGE")
         .setTitle(`Search Results for : ${args.join(' ')}`)
         .setDescription(`\n\n${res.tracks.map((t, i) => `**${i + 1}**) [${t.title}](${t.url})`).slice(0,10).join('\n\n')}\n\nSelect choice [1-10] or *cancel*`)
 

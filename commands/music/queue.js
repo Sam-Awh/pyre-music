@@ -16,7 +16,7 @@ module.exports = {
         const embed = new MessageEmbed();
         const methods = ['', '🔁', '🔂'];
 
-        embed.setColor('PURPLE');
+        embed.setColor('ORANGE');
         embed.setThumbnail(message.guild.iconURL({ size: 2048, dynamic: true }));
         embed.setAuthor(`Server queue - ${message.guild.name} ${methods[queue.repeatMode]}`, client.user.displayAvatarURL({ size: 1024, dynamic: true }));
 
@@ -28,7 +28,7 @@ module.exports = {
         embed.setDescription(`Current ${queue.current.title}\n\n${tracks.slice(0, 5).join('\n')}\n\n${nextSongs}`);
 
         embed.setTimestamp();
-        embed.setFooter('© FROP', message.author.avatarURL({ dynamic: true }));
+        embed.setFooter('© Pyreworks', message.author.avatarURL({ dynamic: true }));
 
         message.channel.send({ embeds: [embed] });
     },

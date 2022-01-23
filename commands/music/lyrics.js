@@ -19,10 +19,10 @@ module.exports = {
 
       const embed = new MessageEmbed()
        embed.setTitle(`**LYRICS | ${song.title}**`)
-       embed.setColor('PURPLE');
+       embed.setColor('ORANGE');
        embed.setDescription(song.lyrics.length > 1900 ? song.lyrics.substr(0, 1897) + '...' : song.lyrics)
        embed.setTimestamp();
-       embed.setFooter('© FROP', message.author.avatarURL({ dynamic: true }));
+       embed.setFooter('© Pyreworks', message.author.avatarURL({ dynamic: true }));
 
       message.channel.send({embeds:[embed]})     
     },
