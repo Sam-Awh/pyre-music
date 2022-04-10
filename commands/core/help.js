@@ -14,7 +14,7 @@ module.exports = {
 
         const commands = client.commands.filter(x => x.showHelp !== false);
 
-        embed.setDescription('Music Functionality for the P&P Bot cluster! | Developed and Maintained by FROP.');
+        embed.setDescription('Music Functionality for the Pyreworks Bot cluster. | Developed and Maintained by Pyreworks.');
         embed.addField(`Enabled - ${commands.size}`, commands.map(x => `\`${x.name}${x.aliases[0] ? ` (${x.aliases.map(y => y).join(', ')})\`` : '\`'}`).join(' | '));
 
         embed.setTimestamp();
