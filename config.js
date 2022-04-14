@@ -2,7 +2,7 @@ module.exports = {
     app: {
         px: 'm1',
         token: 'ODk5MzEwMDYyMjYxMTI1MTcw.YWw5ww.1SjB9Myi9gzMn5siRrC_DqLiHzY',
-        playing: 'Music | Pyre'
+        playing: 'Music!'
     },
 
     opt: {
