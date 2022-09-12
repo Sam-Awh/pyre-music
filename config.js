@@ -1,8 +1,7 @@
 module.exports = {
     app: {
         px: 'm!',
-        token: 'token goes here',
-        playing: 'Music at Pyreworks!'
+        playing: 'music at Pyreworks!'
     },
 
     opt: {
