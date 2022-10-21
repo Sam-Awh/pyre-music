@@ -1,16 +1,43 @@
+const { MessageEmbed } = require('discord.js');
+require("dotenv").config();
+
 module.exports = {
-    name: 'pause',
-    aliases: [],
-    utilisation: '{prefix}pause',
-    voiceChannel: true,
-
-    execute(client, message) {
-        const queue = player.getQueue(message.guild.id);
-
-        if (!queue) return message.channel.send(`No music currently playing ${message.author}... try again ? ❌`);
-
-        const success = queue.setPaused(true);
-
-        return message.channel.send(success ? `Current music ${queue.current.title} paused ✅` : `Something went wrong ${message.author}... try again ? ❌`);
-    },
-};
+    name: "pause",
+    aliases: ["pause"],
+    category: "Music",
+    description: "Pause the current song.",
+    usage: "",
+    run: async (client, message, args) => {
+        const queue = await client.distube.getQueue(message.guild.id);
+        const voiceChannel = message.member.voice.channel;
+        if(!voiceChannel) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription(`You need to join a voice channel to use this feature.`)
+        ]});
+        if(!queue) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('No songs are playing!')
+        ]})
+        if(queue) {
+            if(message.guild.me.voice.channelId !== message.member.voice.channelId) {
+                return message.reply({embeds: [
+                    new MessageEmbed()
+                    .setColor('RED')
+                    .setAuthor({name: 'Something went wrong...'})
+                    .setDescription(`You need to be on the same voice channel as the bot!`)
+                ]});
+            }
+        }
+        queue.pause();
+        message.reply({embeds: [
+            new MessageEmbed()
+            .setColor(`${process.env.EMBED_COLOR}`)
+            .setAuthor({name: 'Pause'})
+            .setDescription('Song paused!')
+        ]})
+    }
+}

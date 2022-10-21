@@ -1,26 +1,53 @@
-const maxVol = client.config.opt.maxVol;
+const { MessageEmbed } = require('discord.js');
+require("dotenv").config();
 
 module.exports = {
-    name: 'volume',
-    aliases: ['vol'],
-    utilisation: `{prefix}volume [1-${maxVol}]`,
-    voiceChannel: true,
+    name: "volume",
+    aliases: ["vol"],
+    category: "Music",
+    description: "Changes the volume of the current song.",
+    usage: "<volume>",
+    run: async (client, message, args) => {
+        const queue = await client.distube.getQueue(message.guild.id);
+        const voiceChannel = message.member.voice.channel;
+        if(!voiceChannel) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription(`You need to join a voice channel to use this feature.`)
+        ]});
+        if(!queue) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('No songs are playing!')
+        ]})
+        if(queue) {
+            if(message.guild.me.voice.channelId !== message.member.voice.channelId) {
+                return message.reply({embeds: [
+                    new MessageEmbed()
+                    .setColor('RED')
+                    .setAuthor({name: 'Something went wrong...'})
+                    .setDescription(`You need to be on the same voice channel as the bot!`)
+                ]});
+            }
+        }
 
-    execute(client, message, args) {
-        const queue = player.getQueue(message.guild.id);
+        if (!args[0]) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('You have not entered a number to change the volume!')
+        ]});
 
-        if (!queue || !queue.playing) return message.channel.send(`No music currently playing ${message.author}... try again ? ❌`);
+        const volume = parseInt(args[0]);
+        queue.setVolume(volume);
 
-        const vol = parseInt(args[0]);
-
-        if (!vol) return message.channel.send(`The current volume is ${queue.volume} 🔊\n*To change the volume enter a valid number between **1** and **${maxVol}**.*`);
-
-        if (queue.volume === vol) return message.channel.send(`The volume you want to change is already the current one ${message.author}... try again ? ❌`);
-
-        if (vol < 0 || vol > maxVol) return message.channel.send(`The specified number is not valid. Enter a number between **1** and **${maxVol}** ${message.author}... try again ? ❌`);
-
-        const success = queue.setVolume(vol);
-
-        return message.channel.send(success ? `The volume has been modified to **${vol}**/**${maxVol}**% 🔊` : `Something went wrong ${message.author}... try again ? ❌`);
-    },
-};
+        message.reply({embeds: [
+            new MessageEmbed()
+            .setColor(`${process.env.EMBED_COLOR}`)
+            .setAuthor({name: 'Volume Changed'})
+            .setDescription(`Changed the volume to **${volume}%**`)
+        ]})
+    }
+}

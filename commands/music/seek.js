@@ -1,22 +1,62 @@
-const ms = require('ms');
+const { MessageEmbed } = require('discord.js');
+require("dotenv").config();
 
 module.exports = {
-    name: 'seek',
-    aliases: [],
-    utilisation: '{prefix}seek [time]',
-    voiceChannel: true,
+    name: "seek",
+    aliases: ["seek"],
+    category: "Music",
+    description: "Seek to a specific time in the current song.",
+    usage: "<time>",
+    run: async (client, message, args) => {
+        const queue = await client.distube.getQueue(message.guild.id);
+        const voiceChannel = message.member.voice.channel;
+        if(!voiceChannel) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription(`You need to join a voice channel to use this feature.`)
+        ]});
+        if(!queue) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('No songs are playing!')
+        ]})
+        if(queue) {
+            if(message.guild.me.voice.channelId !== message.member.voice.channelId) {
+                return message.reply({embeds: [
+                    new MessageEmbed()
+                    .setColor('RED')
+                    .setAuthor({name: 'Something went wrong...'})
+                    .setDescription(`You need to be on the same voice channel as the bot!`)
+                ]});
+            }
+        }
+        
+        if(!args[0]) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('You must choose a timeline to rewind!')
+        ]})
 
-    async execute(client, message, args) {
-        const queue = player.getQueue(message.guild.id);
+        const time = Number(args.join(' '));
+        console.log(time)
+        console.log(queue.songs[0].formattedDuration)
+        console.log(queue.songs[0].duration)
+        if(time > queue.songs[0].formattedDuration) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('The seek time cannot be greater than the song duration!')
+        ]})
 
-        if (!queue || !queue.playing) return message.channel.send(`No music currently playing ${message.author}... try again ? ❌`);
-
-        const timeToMS = ms(args.join(' '));
-
-        if (timeToMS >= queue.current.durationMS) return message.channel.send(`The indicated time is higher than the total time of the current song ${message.author}... try again ? ❌\n*Try for example a valid time like **5s, 10s, 20 seconds, 1m**...*`);
-
-        await queue.seek(timeToMS);
-
-        message.channel.send(`Time set on the current song **${ms(timeToMS, { long: true })}** ✅`);
-    },
-};
+        queue.seek(time);
+        message.reply({embeds: [
+            new MessageEmbed()
+            .setColor(`${process.env.EMBED_COLOR}`)
+            .setAuthor({name: 'Seek'})
+            .setDescription(`Fast forward to **${time}ms / ${queue.songs[0].duration}ms**`)
+        ]})
+    }
+}

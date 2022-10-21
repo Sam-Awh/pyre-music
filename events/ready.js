@@ -1,5 +1,18 @@
-module.exports = async (client) => {
-    console.log(`Logged to the client ${client.user.username}\n-> Ready on ${client.guilds.cache.size} servers for a total of ${client.users.cache.size} users`);
+const client = require("../index");
 
-    client.user.setActivity(client.config.app.playing);
-};
+client.on("ready", () => {
+    console.log("\x1b[34m%s\x1b[0m", `${client.user.tag} is ready to go!`)
+    const statuses = [ // status bot
+        "music at Pyreworks!",
+    ]
+    let index = 0
+    setInterval(() => {
+        if (index === statuses.length) index = 0
+        const status = statuses[index]
+        client.user.setActivity(`${status}`, {
+            type: "PLAYING",
+            browser: "DISCORD IOS"
+        })
+        index++
+    }, 10000)
+})

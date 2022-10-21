@@ -1,33 +1,60 @@
+const { MessageEmbed } = require('discord.js');
+require("dotenv").config();
+
 module.exports = {
-    name: 'filter',
-    aliases: [],
-    utilisation: '{prefix}filter [filter name]',
-    voiceChannel: true,
+    name: "filter",
+    aliases: ["filter"],
+    category: "Music",
+    description: "Filter the queue.",
+    usage: "",
+    run: async (client, message, args) => {
+        const queue = await client.distube.getQueue(message.guild.id);
+        const voiceChannel = message.member.voice.channel;
+        if(!voiceChannel) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription(`You need to join a voice channel to use this feature.`)
+        ]});
+        if(!queue) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('No songs are playing!')
+        ]})
+        if(queue) {
+            if(message.guild.me.voice.channelId !== message.member.voice.channelId) {
+                return message.reply({embeds: [
+                    new MessageEmbed()
+                    .setColor('RED')
+                    .setAuthor({name: 'Something went wrong...'})
+                    .setDescription(`You need to be on the same voice channel as the bot!`)
+                ]});
+            }
+        }
 
-    async execute(client, message, args) {
-        const queue = player.getQueue(message.guild.id);
+        if(!args[0]) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription(`Please choose a suitable filter!
+            \nFilter list: \`3d, bassboost, echo, karaoke, nightcore, vaporwave, flanger, gate, haas, reverb, surround, mcompand, phaser, tremolo, earwax\``)
+        ]})
 
-        if (!queue || !queue.playing) return message.channel.send(`No music currently playing ${message.author}... try again ? ❌`);
+        if(args[0] === 'off' && queue.filter?.length) queue.setFilter(false);
+        else if(Object.keys(client.distube.filters).includes(args[0])) queue.setFilter(args[0]);
+        else if(args[0]) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('No matching filters found!')
+        ]})
 
-        const actualFilter = queue.getFiltersEnabled()[0];
-
-        if (!args[0]) return message.channel.send(`Please specify a valid filter to enable or disable ${message.author}... try again ? ❌\n${actualFilter ? `Filter currently active ${actualFilter} (${client.config.app.px}filter ${actualFilter} to disable it).\n` : ''}`);
-
-        const filters = [];
-
-        queue.getFiltersEnabled().map(x => filters.push(x));
-        queue.getFiltersDisabled().map(x => filters.push(x));
-
-        const filter = filters.find((x) => x.toLowerCase() === args[0].toLowerCase());
-
-        if (!filter) return message.channel.send(`This filter doesn't exist ${message.author}... try again ? ❌\n${actualFilter ? `Filter currently active ${actualFilter}.\n` : ''}List of available filters ${filters.map(x => `**${x}**`).join(', ')}.`);
-
-        const filtersUpdated = {};
-
-        filtersUpdated[filter] = queue.getFiltersEnabled().includes(filter) ? false : true;
-
-        await queue.setFilters(filtersUpdated);
-
-        message.channel.send(`The filter ${filter} is now **${queue.getFiltersEnabled().includes(filter) ? 'enabled' : 'disabled'}** ✅\n*Reminder the longer the music is, the longer this will take.*`);
-    },
-};
+        message.reply({embeds: [
+            new MessageEmbed()
+            .setColor(`${process.env.EMBED_COLOR}`)
+            .setAuthor({name: 'Filter'})
+            .setDescription(`Changed the filter to: **${queue.filters.join(', ') || 'Off'}**`)
+        ]})
+    }
+}

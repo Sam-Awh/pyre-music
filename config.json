@@ -1,0 +1,6 @@
+{
+    "prefix": "m!",
+    "spotifyapi": {
+        "enabled": true
+  }
+}

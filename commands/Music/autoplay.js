@@ -1,13 +1,13 @@
-const { MessageEmbed } = require('discord.js');
+const {MessageEmbed} = require('discord.js');
 require("dotenv").config();
 
 module.exports = {
-    name: "loop",
-    aliases: ["repeat"],
-    category: "Music",
-    description: "Repeat the current song/queue.",
-    usage: "loop",
-
+    name: 'autoplay',   
+    description: 'Automatically play the track.',
+    aliases: ['autoplay'],
+    category: 'Music',
+    usage: '',
+    cooldown: 0,
     run: async (client, message, args) => {
         const queue = await client.distube.getQueue(message.guild.id);
         const voiceChannel = message.member.voice.channel;
@@ -33,39 +33,13 @@ module.exports = {
                 ]});
             }
         }
-
-        let mode = null;
-        if(!args[0]) {
-            mode = 0;
-            message.reply({embeds: [
-                new MessageEmbed()
-                .setColor('RED') 
-                .setAuthor({name: 'Something went wrong...'})
-                .setDescription('Choose a valid option!')
-                .addFields({ name: 'off', value: 'Don\'t repeat the track/queue.', inline: true},
-                { name: 'song', value: '┕Repeat the track (song).', inline: true},
-                { name: 'queue', value: '┕Repeat the entire queue.', inline: true},)
-            ]})
-        }
-
-        switch (args[0]) {
-        case 'off':
-            mode = 0
-            break
-        case 'song':
-            mode = 1
-            break
-        case 'queue':
-            mode = 2
-            break
-        }
-        mode = queue.setRepeatMode(mode)
-        mode = mode ? (mode === 2 ? 'Queue' : 'Track') : 'OFF'
-        message.reply({embeds: [
+        
+        const autoplay = queue.toggleAutoplay()
+        message.channel.send({embeds: [
             new MessageEmbed()
             .setColor(`${process.env.EMBED_COLOR}`)
-            .setAuthor({name: 'Loop'})
-            .setDescription(`Loop Mode has been updated to: **${mode}**!`)
+            .setAuthor({name: 'AutoPlay'})
+            .setDescription(`Automatically play the track: ${autoplay ? '**ON**' : '**OFF**'}`)
         ]})
     }
 }

@@ -1,36 +1,51 @@
-const { QueryType } = require('discord-player');
+// const player = require('../../client/player.js');
+const { MessageEmbed } = require('discord.js');
+require("dotenv").config();
 
 module.exports = {
     name: 'play',
+    description: 'Play a song from YouTube, SoundCloud, Spotify, a direct link etc.',
     aliases: ['p'],
-    utilisation: '{prefix}play [song name/URL]',
-    voiceChannel: true,
+    usage: '<song name>',
+    category: 'Music',
+    cooldown: 0,
+    guildOnly: true,
+    args: true,
+    run: async (client, message, args) => {
+        const string = args.join(' ')
+        const queue = await client.distube.getQueue(message.guild.id);
+        const voiceChannel = message.member.voice.channel;
+        if(!voiceChannel) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription(`You need to join a voice channel to use this feature.`)
+        ]});
 
-    async execute(client, message, args) {
-        if (!args[0]) return message.channel.send(`Please enter a valid search ${message.author}... try again ? ❌`);
-
-        const res = await player.search(args.join(' '), {
-            requestedBy: message.member,
-            searchEngine: QueryType.AUTO
-        });
-
-        if (!res || !res.tracks.length) return message.channel.send(`No results found ${message.author}... try again ? ❌`);
-
-        const queue = await player.createQueue(message.guild, {
-            metadata: message.channel
-        });
-
-        try {
-            if (!queue.connection) await queue.connect(message.member.voice.channel);
-        } catch {
-            await player.deleteQueue(message.guild.id);
-            return message.channel.send(`I can't join the voice channel ${message.author}... try again ? ❌`);
+        if(queue) {
+            if(message.guild.me.voice.channelId !== message.member.voice.channelId) {
+                return message.reply({embeds: [
+                    new MessageEmbed()
+                    .setColor('RED')
+                    .setAuthor({name: 'Something went wrong...'})
+                    .setDescription(`You need to be on the same voice channel as the bot!`)
+                ]});
+            }
         }
 
-        await message.channel.send(`Loading your ${res.playlist ? 'playlist' : 'track'}... 🎧`);
+        const msg = await message.reply({embeds: [
+            new MessageEmbed()
+            .setColor(`${process.env.EMBED_COLOR}`)
+            .setAuthor({name: 'Query'})
+            .setDescription(`Searching...`)
+        ]})
 
-        res.playlist ? queue.addTracks(res.tracks) : queue.addTrack(res.tracks[0]);
+        setTimeout(() => msg.delete() , 5000);
 
-        if (!queue.playing) await queue.play();
-    },
-};
+        client.distube.play(voiceChannel, string, {
+            member: message.member,
+            textChannel: message.channel,
+            message
+        })
+    }
+}

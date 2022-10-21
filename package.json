@@ -1,32 +1,42 @@
 {
-  "name": "pyreworks",
-  "version": "1.0.0",
-  "description": "pyreworks",
-  "main": "main.js",
+  "name": "pyreworks-music-module",
+  "version": "6.0.0",
+  "description": "music for pyre",
+  "main": "index.js",
+  "dependencies": {
+    "@discordjs/opus": "^0.8.0",
+    "@distube/soundcloud": "^1.1.0",
+    "@distube/spotify": "^1.2.1",
+    "@distube/yt-dlp": "^0.0.2",
+    "ascii-table": "^0.0.9",
+    "axios": "^0.23.0",
+    "common-tags": "^1.8.2",
+    "discord-player": "^5.1.0",
+    "discord.js": "^13.2.0",
+    "distube": "^3.3.1-1",
+    "dotenv": "^16.0.3",
+    "ffmpeg-static": "^4.4.0",
+    "glob": "^7.1.7",
+    "y": "^0.3.2"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "engines": {
+    "node": "16.9.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bigblackfootman/pyremusic.git"
+    "url": "git+https://github.com/Sam-Awh/pyre-music.git"
   },
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "music"
+  ],
+  "author": "Sam-Awh",
+  "license": "SEE LICENSE IN pyreworks.com/docs",
   "bugs": {
-    "url": "https://github.com/bigblackfootman/pyremusic/issues"
+    "url": "https://github.com/Sam-Awh/pyre-music/issues"
   },
-  "homepage": "https://github.com/bigblackfootman/pyremusic#readme",
-  "dependencies": {
-    "@discord-player/extractor": "^3.0.2",
-    "cjs": "^0.0.11",
-    "discord-player": "^5.2.2",
-    "discord.js": "^13.6.0",
-    "dotenv": "^16.0.1",
-    "ffmpeg": "^0.0.4",
-    "ffmpeg-static": "^4.4.1",
-    "fs": "^0.0.1-security",
-    "ms": "^2.1.3",
-    "opus": "^0.0.0",
-    "opusscript": "^0.0.8"
-  }
+  "homepage": "https://github.com/Sam-Awh/pyre-music#readme"
 }

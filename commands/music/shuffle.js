@@ -1,18 +1,44 @@
+const { MessageEmbed } = require('discord.js');
+require("dotenv").config();
+
 module.exports = {
-    name: 'shuffle',
-    aliases: ['sh'],
-    utilisation: '{prefix}shuffle',
-    voiceChannel: true,
+    name: "shuffle",
+    aliases: ["shuffle"],
+    category: "Music",
+    description: "Shuffle the queue.",
+    usage: "",
+    run: async (client, message, args) => {
+        const queue = await client.distube.getQueue(message.guild.id);
+        const voiceChannel = message.member.voice.channel;
+        if(!voiceChannel) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription(`You need to join a voice channel to use this feature.`)
+        ]});
+        if(!queue) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('No songs are playing!')
+        ]})
+        if(queue) {
+            if(message.guild.me.voice.channelId !== message.member.voice.channelId) {
+                return message.reply({embeds: [
+                    new MessageEmbed()
+                    .setColor('RED')
+                    .setAuthor({name: 'Something went wrong...'})
+                    .setDescription(`You need to be on the same voice channel as the bot!`)
+                ]});
+            }
+        }
 
-    async execute(client, message) {
-        const queue = player.getQueue(message.guild.id);
-
-        if (!queue || !queue.playing) return message.channel.send(`No music currently playing ${message.author}... try again ? ❌`);
-
-        if (!queue.tracks[0]) return message.channel.send(`No music in the queue after the current one ${message.author}... try again ? ❌`);
-
-        await queue.shuffle();
-
-        return message.channel.send(`Queue shuffled **${queue.tracks.length}** song(s) ! ✅`);
-    },
-};
+        queue.shuffle();
+        message.reply({embeds: [
+            new MessageEmbed()
+            .setColor(`${process.env.EMBED_COLOR}`)
+            .setAuthor({name: 'Shuffle'})
+            .setDescription('Shuffled the playlist!')
+        ]})
+    }
+}

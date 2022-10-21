@@ -1,35 +1,58 @@
-const { MessageEmbed } = require('discord.js');
+const { MessageEmbed, MessageButton } = require('discord.js');
+require("dotenv").config();
 
 module.exports = {
     name: 'queue',
+    description: 'Show playlist',
+    category: 'Music',
     aliases: ['q'],
-    utilisation: '{prefix}queue',
-    voiceChannel: true,
+    usage: 'queue',
+    cooldown: 5,
+    run: async (client, message, args, _fromButton = false) => {
+        const queue = await client.distube.getQueue(message.guild.id);
+        const voiceChannel = message.member.voice.channel;
+        if(!voiceChannel) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription(`You need to join a voice channel to use this feature.`)
+        ]});
+        if(!queue) return message.reply({embeds: [
+            new MessageEmbed()
+            .setColor('RED')
+            .setAuthor({name: 'Something went wrong...'})
+            .setDescription('No songs are playing!')
+        ]})
+        if(queue) {
+            if(message.guild.me.voice.channelId !== message.member.voice.channelId) {
+                return message.reply({embeds: [
+                    new MessageEmbed()
+                    .setColor('RED')
+                    .setAuthor({name: 'Something went wrong...'})
+                    .setDescription(`You need to be on the same voice channel as the bot!`)
+                ]});
+            }
+        }
 
-    execute(client, message) {
-        const queue = player.getQueue(message.guild.id);
+        const q = queue.songs
+        .map((song, i) => `${i === 0 ? 'Playing:' : `${i}.`} ${song.name} - \`${song.formattedDuration}\``)
+        .join('\n')
 
-        if (!queue) return message.channel.send(`No music currently playing ${message.author}... try again ? ❌`);
+        const tracks = queue.songs
+        .map((song, i) => `**${i + 1}** - [${song.name}](${song.url}) | ${song.formattedDuration}
+        Added by : ${song.user}`)
 
-        if (!queue.tracks[0]) return message.channel.send(`No music in the queue after the current one ${message.author}... try again ? ❌`);
+        const songs = queue.songs.length;
+        const nextSongs = songs > 10 ? `And **${songs - 10}** more songs...` : `In playlist **${songs}** songs...`;
 
-        const embed = new MessageEmbed();
-        const methods = ['', '🔁', '🔂'];
-
-        embed.setColor('ORANGE');
-        embed.setThumbnail(message.guild.iconURL({ size: 2048, dynamic: true }));
-        embed.setAuthor(`Server queue - ${message.guild.name} ${methods[queue.repeatMode]}`, client.user.displayAvatarURL({ size: 1024, dynamic: true }));
-
-        const tracks = queue.tracks.map((track, i) => `**${i + 1}** - ${track.title} | ${track.author} (requested by : ${track.requestedBy.username})`);
-
-        const songs = queue.tracks.length;
-        const nextSongs = songs > 5 ? `And **${songs - 5}** other song(s)...` : `In the playlist **${songs}** song(s)...`;
-
-        embed.setDescription(`Current ${queue.current.title}\n\n${tracks.slice(0, 5).join('\n')}\n\n${nextSongs}`);
-
-        embed.setTimestamp();
-        embed.setFooter('© Pyreworks', message.author.avatarURL({ dynamic: true }));
-
-        message.channel.send({ embeds: [embed] });
-    },
-};
+        message.reply({embeds: [
+            new MessageEmbed()
+            .setColor(`${process.env.EMBED_COLOR}`)
+            .setAuthor({name: 'Queue'})
+            .setDescription(`${tracks.slice(0, 10).join('\n')}\n\n${nextSongs}`)
+            .addFields({ name: `Now playing:`, values: `┕[${queue.songs[0].name}](${queue.songs[0].url}) - ${queue.songs[0].formattedDuration} | Requested by: ${queue.songs[0].user}`,inline: false},
+            { name: `Total duration:`, values: `┕${queue.formattedDuration}`,inline: false},
+            { name: `Total number of songs:`, values: `┕${songs}`,inline: false},)
+        ]})
+    }
+}
