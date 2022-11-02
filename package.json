@@ -17,6 +17,7 @@
     "dotenv": "^16.0.3",
     "ffmpeg-static": "^4.4.0",
     "glob": "^7.1.7",
+    "solenolyrics": "^5.0.0",
     "y": "^0.3.2"
   },
   "scripts": {
