@@ -40,7 +40,7 @@ module.exports = async (client) => {
 
     // Slash Commands
 
-    const Table_slash = new Ascii(`SlashCommands Loaded`)
+    const Table_slash = new Ascii(`[Pyre | Loader]SlashCommands Loaded`)
 
     const slashCommands = await globPromise(
         `${process.cwd()}/SlashCommands/*/*.js`

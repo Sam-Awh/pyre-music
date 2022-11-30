@@ -20,7 +20,7 @@ module.exports = {
         if(!queue) return message.reply({embeds: [
             new MessageEmbed()
             .setColor('RED')
-            .setAuthor({name: 'Something went wrong...'})
+            .setAuthor({ name: 'Something went wrong...' })
             .setDescription('No songs are playing!')
         ]})
         if(queue) {
