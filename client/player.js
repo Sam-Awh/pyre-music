@@ -3,7 +3,7 @@ const client = require("../index.js");
 const { MessageEmbed } = require('discord.js');
 const { SpotifyPlugin } = require('@distube/spotify');
 const { SoundCloudPlugin } = require('@distube/soundcloud');
-const { YouTubeDLPlugin } = require("@distube/yt-dlp")
+// const { YouTubeDLPlugin } = require("@distube/yt-dlp")
 const Format = Intl.NumberFormat();
 const config = require('../config.json')
 require("dotenv").config();

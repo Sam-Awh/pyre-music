@@ -11,7 +11,7 @@ const globPromise = promisify(glob);
  */
 module.exports = async (client) => {
     // Commands
-    const Table_command = new Ascii("[Pyre| Loader] Commands Loaded");
+    const Table_command = new Ascii("[Pyre| Loader] Commands");
 
     const commandFiles = await globPromise(`${process.cwd()}/commands/**/*.js`);
     commandFiles.map((value) => {
@@ -29,7 +29,7 @@ module.exports = async (client) => {
         if (!file.description)
             return Table_command.addRow(file.name,`[Pyre | Loader] Error in command description.`)
 
-        Table_command.addRow(file.name,`[Pyre | Loader] Successfully loaded Commands.`)
+        Table_command.addRow(file.name,`Successfully loaded`)
     });
 
     console.log(Table_command.toString())
@@ -40,7 +40,7 @@ module.exports = async (client) => {
 
     // Slash Commands
 
-    const Table_slash = new Ascii(`[Pyre | Loader]SlashCommands Loaded`)
+    const Table_slash = new Ascii(`[Pyre | Loader] SlashCommands`)
 
     const slashCommands = await globPromise(
         `${process.cwd()}/SlashCommands/*/*.js`
@@ -60,7 +60,7 @@ module.exports = async (client) => {
         if (!file.description)
             return Table_slash.addRow(file.name,`[Pyre | Loader] Error in command description.`)
 
-        Table_slash.addRow(file.name,`[Pyre | Loader] Successfully loaded Slash Commands.`)
+        Table_slash.addRow(file.name,`Successfully Loaded`)
     });
 
     console.log(Table_slash.toString())
